@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Square } from './Square';
-import { Piece } from './Piece';
+import { Piece, PieceProps, testPiece1, testPiece2 } from './Piece';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 export interface ISubmitResult {
@@ -8,9 +8,10 @@ export interface ISubmitResult {
     "square-2": [number] | null;
 }
 
+
 export const Board = () => {
     const [myState, setMyState] = useState<any>([
-        [[1],[],[],[],[],[],[],[]],
+        [[testPiece1],[testPiece2],[],[],[],[],[],[]],
         [[],[],[],[],[],[],[],[]],
         [[],[],[],[],[],[],[],[]],
         [[],[],[],[],[],[],[],[]],
@@ -19,18 +20,28 @@ export const Board = () => {
         [[],[],[],[],[],[],[],[]],
         [[],[],[],[],[],[],[],[]]
     ]);
+
+    // console.log(myState);
     const onDragEnd = (result: any) => {
         const { source, destination } : {source: any, destination: any} = result;
  
         if (destination && source.droppableId !== destination.droppableId) {
             const [sourceRow, sourcePosition] = source.droppableId.split('-');
             const [destinationRow, destinationPosition] = destination.droppableId.split('-');
+
             
             const newState: any = [
                 ...myState,
             ];
 
-            newState[destinationRow][destinationPosition] = newState[sourceRow][sourcePosition];
+            const targetPiece = newState[sourceRow][sourcePosition];
+
+            // TODO: Do this once the movement is secured
+            targetPiece[0].moveCount ++;
+            targetPiece[0].posX = destinationRow;
+            targetPiece[0].posY = destinationPosition;
+
+            newState[destinationRow][destinationPosition] = targetPiece;
             newState[sourceRow][sourcePosition] = [];
     
             setMyState(newState);
@@ -46,10 +57,10 @@ export const Board = () => {
         >
             {myState.map((row: any, rowIndex: any) => 
                 <div className="chess-row" key={`chess-row-${rowIndex}`}>
-                    {row.map((square: any, squareIndex: any) =>
+                    {row.map((square: Array<PieceProps>, squareIndex: any) =>
                         <Square id={`${rowIndex}-${squareIndex}`} key={`chess-square-${squareIndex}`}>
                             {square.length > 0 && 
-                                <Piece id={'piece'} />
+                                <Piece piece={square[0]} />
                             }
                         </Square>
                     )}
