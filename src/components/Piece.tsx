@@ -1,54 +1,22 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { PieceClass, PieceColor } from "../classes/Piece";
 
-enum PieceColor {
-    Black = 'black', White = 'white'
-}
-
-enum PieceType {
-    King = 'king',
-    Queen = 'queen',
-    Rook = 'rook',
-    Bishop = 'bishop',
-    Knight = 'knight',
-    Pawn = 'pawn'
-}
-
-// Make this a class to be able to instantiate
-export type PieceProps = {
-    color: PieceColor
-    type: PieceType
-    // if no pos available it should assign the one 
-    posX: number;
-    posY: number;
-    moveCount: number;
-}
-
-export const testPiece1: PieceProps = {
-    color: PieceColor.Black,
-    type: PieceType.King,
-    posX: 0,
-    posY: 0,
-    moveCount: 0,
-};
-
-export const testPiece2: PieceProps = {
-    color: PieceColor.White,
-    type: PieceType.Rook,
-    posX: 0,
-    posY: 1,
-    moveCount: 0,
-};
-
-export const Piece = ({piece}: {piece: PieceProps}) => {
-    const keyProps = `${piece.posX}-${piece.posY}`;
-    const filterValue = piece.color === PieceColor.Black  ? 'invert(0)' : 'invert(1)';
+export const Piece = ({piece, posX, posY, handleClick}: {piece: PieceClass, posX: number, posY: number, handleClick: (piece: PieceClass) => void}) => {
+    const keyProps = `${posX}-${posY}`;
+    const filterValue = piece.color === PieceColor.White  ? 'invert(0)' : 'invert(1)';
+    
+    if (piece.posX === undefined || piece.posY === undefined) {
+        piece.setPos(posX, posY);
+    }
 
     return (
         <Draggable
         key={keyProps}
         draggableId={keyProps}
-        index={Number('1' + piece.posX + piece.posY)}
+        index={Number('1' + posX + posY)}
+        //Keep track of the turn and disable other pieces
+        isDragDisabled={false}
         >
         {(provided, snapshot) => (
             <div
@@ -63,6 +31,7 @@ export const Piece = ({piece}: {piece: PieceProps}) => {
                 width="70px"
                 height="70px"
                 style={{cursor: 'pointer', filter: filterValue}}
+                onMouseDown={() => handleClick(piece)}
             />
             </div>
         )}

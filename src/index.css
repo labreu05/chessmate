@@ -19,6 +19,7 @@ code {
 .chess-square {
   width: 70px;
   height: 70px;
+  overflow: hidden;
 }
 
 .chess-row:nth-child(odd) .chess-square:nth-child(odd) {
