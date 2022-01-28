@@ -1,11 +1,11 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { PieceClass, PieceColor } from "../classes/Piece";
+import { ChessPiece, PieceColor } from "../classes/ChessPiece";
 
-export const Piece = ({piece, posX, posY, handleClick}: {piece: PieceClass, posX: number, posY: number, handleClick: (piece: PieceClass) => void}) => {
+export const Piece = ({piece, posX, posY, handleClick}: {piece: ChessPiece, posX: number, posY: number, handleClick: (piece: ChessPiece) => void}) => {
     const keyProps = `${posX}-${posY}`;
     const filterValue = piece.color === PieceColor.White  ? 'invert(0)' : 'invert(1)';
-    
+
     if (piece.posX === undefined || piece.posY === undefined) {
         piece.setPos(posX, posY);
     }

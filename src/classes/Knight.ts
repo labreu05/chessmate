@@ -1,6 +1,6 @@
-import { PieceClass, PieceType } from "./Piece";
+import { ChessPiece, PieceType } from "./ChessPiece";
 
-export class Knight extends PieceClass {
+export class Knight extends ChessPiece {
     type = PieceType.Knight;
     continuosMovement = false;
 

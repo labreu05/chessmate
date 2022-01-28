@@ -1,6 +1,6 @@
-import { MOVEMENT_DIAGONAL, MOVEMENT_STRAIGHT, PieceClass, PieceType } from "./Piece";
+import { MOVEMENT_DIAGONAL, MOVEMENT_STRAIGHT, ChessPiece, PieceType } from "./ChessPiece";
 
-export class Queen extends PieceClass {
+export class Queen extends ChessPiece {
     type = PieceType.Queen;
     continuosMovement = true;
 

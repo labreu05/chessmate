@@ -1,6 +1,7 @@
-import { MOVEMENT_STRAIGHT, PieceClass, PieceType } from "./Piece";
+import { CastleableChessPiece } from "./CastleableChessPiece";
+import { MOVEMENT_STRAIGHT, ChessPiece, PieceType, MOVEMENT_LEFT, MOVEMENT_RIGHT } from "./ChessPiece";
 
-export class Rook extends PieceClass {
+export class Rook extends CastleableChessPiece {
     type = PieceType.Rook;
     continuosMovement = true;
 
@@ -8,4 +9,3 @@ export class Rook extends PieceClass {
         return MOVEMENT_STRAIGHT;
     }
 }
-

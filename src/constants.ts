@@ -1,0 +1,1 @@
+export const BOARD_POSITION_ID_PREFIX = 'chess-square-';
