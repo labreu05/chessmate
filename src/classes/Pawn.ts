@@ -1,5 +1,7 @@
-import { BOARD_POSITION_ID_PREFIX } from "../constants";
-import { ChessPiece, NEGATIVE_MOVEMENT, PieceColor, PieceType, POSITIVE_MOVEMENT } from "./ChessPiece";
+import { NEGATIVE_MOVEMENT, POSITIVE_MOVEMENT } from "../utils/constants";
+import { getBoardPositionId } from "../utils/helpers";
+import { PieceColor, PieceType } from "../utils/types";
+import { ChessPiece } from "./ChessPiece";
 
 export class Pawn extends ChessPiece {
     type = PieceType.Pawn;
@@ -17,21 +19,21 @@ export class Pawn extends ChessPiece {
         return [[this.movementDirection, 0]];
     }
     
-
     getMovements(boardState: (ChessPiece|null)[][]) {
         const movements: string[] = [];
-        const [ direction ] = this.directions;
+        const [direction] = this.directions;
         const [px, py] = direction;
         const [currentX, currentY] = [this.posX + px, this.posY + py];
         const possiblePosition = boardState?.[currentX]?.[currentY];
+        const positionId = getBoardPositionId(currentX, currentY);
 
         if (!possiblePosition) {
-            movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`)
+            movements.push(positionId)
 
             const twoStepMovement = boardState?.[currentX + (this.movementDirection)]?.[currentY];
 
-            if (this.moveCount === 0 && !twoStepMovement) {
-                movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX + (this.movementDirection)}-${currentY}`)
+            if (this.atInitialPosition() && !twoStepMovement) {
+                movements.push(getBoardPositionId(currentX + (this.movementDirection), currentY));
             }
         }
 
@@ -42,10 +44,9 @@ export class Pawn extends ChessPiece {
             const possiblePosition = boardState?.[currentX]?.[currentY];
 
             if (possiblePosition && possiblePosition?.color !== this.color) {
-                movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`);   
+                movements.push(getBoardPositionId(currentX, currentY));   
             }             
         });
-
 
         return movements;
     }

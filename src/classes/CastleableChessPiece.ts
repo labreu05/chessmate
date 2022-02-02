@@ -1,48 +1,48 @@
-import { BOARD_POSITION_ID_PREFIX } from "../constants";
-import { ChessPiece, MOVEMENT_LEFT, MOVEMENT_RIGHT, PieceType } from "./ChessPiece";
-import { Pawn } from "./Pawn";
+import { MOVEMENT_LEFT, MOVEMENT_RIGHT } from "../utils/constants";
+import { cloneBoardState, getBoardPositionId, getCoordinateFromBoardId } from "../utils/helpers";
+import { BoardState, PieceType } from "../utils/types";
+import { ChessPiece } from "./ChessPiece";
+import { PlaceholderChessPiece } from "./PlaceholderChessPiece";
 
 export abstract class CastleableChessPiece extends ChessPiece {
-    getMovements(boardState: (ChessPiece | null)[][]): string[] {
+    getMovements(boardState: BoardState): string[] {
         const movements = super.getMovements(boardState);
 
-        if (this.moveCount === 0) {
+        if (this.atInitialPosition()) {
             [MOVEMENT_LEFT, MOVEMENT_RIGHT].forEach(direction => {
-                let look = true                               
+                const castlePath: string[] = [];
                 const [px, py] = direction;
                 let [currentX, currentY] = [this.posX + px, this.posY + py];
-                const castlePath: string[] = [];
+                let look = true                               
 
                 do {
                     const possiblePosition = boardState?.[currentX]?.[currentY];
+                    const positionId = getBoardPositionId(currentX, currentY);
+
                     if (possiblePosition === undefined) {
                         look = false;
                         continue;
                     } else {
                         if (possiblePosition === null) {
-                            castlePath.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`);
+                            castlePath.push(positionId);
                             currentX = currentX + px;
                             currentY = currentY + py;
-                            // KEEP TRACK OF THE MOVEMENTS 
                             continue;
                         } else {
                             if (possiblePosition && [PieceType.King, PieceType.Rook].filter((type) => type !== this.type).includes(possiblePosition.type) && possiblePosition.atInitialPosition()) {
-                                // Check all the opposite pieces to determine if castle is possible or not
-                                if (possiblePosition.type === PieceType.King){
-                                    if (castlePath.length === 3) {
-                                        castlePath[0] = `${BOARD_POSITION_ID_PREFIX}${possiblePosition.posX}-${possiblePosition.posY}`;
-                                    } else {
-                                        castlePath.push(`${BOARD_POSITION_ID_PREFIX}${possiblePosition.posX}-${possiblePosition.posY}`);
-                                    }
+                                if (castlePath.length === 3) {
+                                    this.type === PieceType.King ? castlePath.pop(): castlePath.shift();
                                 }
 
+                                const castleKing = [this, possiblePosition].find(piece => piece.type === PieceType.King);
                                 // Include king's position to also check if its not being attacked
-                                if (this.type === PieceType.King) {
-                                    castlePath.push(`${BOARD_POSITION_ID_PREFIX}${this.posX}-${this.posY}`);
+                                if (castleKing) {
+                                    castlePath.push(getBoardPositionId(castleKing.posX, castleKing.posY));
                                 }
-
+                                
+                                // Check all the opposite pieces to determine if castle is possible or not
                                 if (this.canCastle(boardState, castlePath)) {
-                                    movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`)
+                                    movements.push(positionId);
                                 }
 
                                 look = false;
@@ -51,51 +51,35 @@ export abstract class CastleableChessPiece extends ChessPiece {
                             }
                         }
                     }
-
-                    } while(look);
-                });            
+                } while(look);
+            });            
         }
 
         return movements;
     }
 
- canCastle = (boardState: (ChessPiece | null)[][], castlePath: string[]) => {
-    let canCastle = true;
-    let baseBoard = [...boardState];
+    canCastle = (boardState: BoardState, castlePath: string[]) => {
+        let canCastle = true;
+        const currentBoard = cloneBoardState(boardState);
+        const availablePieces = currentBoard.flatMap(piece => piece).filter(piece => piece !== null && piece.color !== this.color);
+        const fakeBoard = cloneBoardState(currentBoard);
 
-    baseBoard[0] = [...baseBoard[0]];
-    baseBoard[1] = [...baseBoard[1]];
-    baseBoard[2] = [...baseBoard[2]];
-    baseBoard[3] = [...baseBoard[3]];
-    baseBoard[4] = [...baseBoard[4]];
-    baseBoard[5] = [...baseBoard[5]];
-    baseBoard[6] = [...baseBoard[6]];
-    baseBoard[7] = [...baseBoard[7]];
+        castlePath.forEach(positionId => {
+            const [px, py] = getCoordinateFromBoardId(positionId);
+            const placeholderKing = new PlaceholderChessPiece(this.color, [px, py], PieceType.King);
 
-    // Check -> FlatMap
-    baseBoard.forEach(row => {
-        row.forEach(piece => {
-            if (piece && piece?.color !== this.color) {                
-                // console.log('PATH', castlePath);
-                const newBoard = [...baseBoard];
-                castlePath.forEach((id) => {
-                    const [px, py] = getCoordinate(id);
-                    newBoard[px][py]= new Pawn(this.color, [px,py]);
-                });
+            fakeBoard[px][py] = placeholderKing;
+        });
 
+        availablePieces.forEach(piece => {
+            if (piece) {                
                 let moves: string[];
+                // This is to avoid cyclic situation while trying to get movements
                 if ([PieceType.King, PieceType.Rook].includes(piece.type)) {
-                    // This is to avoid cyclic situation while trying to get movements
-                    moves = Object.getPrototypeOf(piece).getMovements(this, newBoard)
+                    moves = Object.getPrototypeOf(piece).getMovements(this, fakeBoard)
                 } else {
-                    moves = piece.getMovements(newBoard);
+                    moves = piece.getMovements(fakeBoard);
                 }
-
-                // if (piece.type === PieceType.Knight) {
-                //     console.log(newBoard);
-                //     console.log('<---------->');
-                //     // console.log(moves, id)
-                // }
 
                 castlePath.forEach((id) => {
                     if (moves?.includes(id)) {
@@ -104,13 +88,8 @@ export abstract class CastleableChessPiece extends ChessPiece {
                 });
             }
         })
-    });
 
-    return canCastle;
-}
+        return canCastle;
+    }
 }
 
-const getCoordinate = (id: string): number[] => {
-   const result = id.replace(BOARD_POSITION_ID_PREFIX, '').split('-');
-   return [Number(result[0]), Number(result[1])];
-}

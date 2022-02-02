@@ -1,5 +1,6 @@
+import { MOVEMENT_DIAGONAL, MOVEMENT_STRAIGHT } from "../utils/constants";
+import { PieceType } from "../utils/types";
 import { CastleableChessPiece } from "./CastleableChessPiece";
-import { MOVEMENT_DIAGONAL, MOVEMENT_STRAIGHT, PieceType } from "./ChessPiece";
 
 export class King extends CastleableChessPiece {
     type = PieceType.King;

@@ -1,29 +1,9 @@
-import { BOARD_POSITION_ID_PREFIX } from "../constants";
-
-export enum PieceColor {
-    Black = 'black',
-    White = 'white'
-}
-
-export enum PieceType {
-    King = 'king',
-    Queen = 'queen',
-    Rook = 'rook',
-    Bishop = 'bishop',
-    Knight = 'knight',
-    Pawn = 'pawn'
-}
-
-export const MOVEMENT_RIGHT = [0,-1];
-export const MOVEMENT_LEFT = [0,1];
-export const MOVEMENT_STRAIGHT = [[0,-1], [0,1], [1,0], [-1,0]];
-export const MOVEMENT_DIAGONAL = [[-1,1], [1,-1], [1,1], [-1,-1]];
-export const POSITIVE_MOVEMENT = 1;
-export const NEGATIVE_MOVEMENT = -1;
+import { getBoardPositionId } from "../utils/helpers";
+import { BoardState, PieceColor, PieceType } from "../utils/types";
 
 export abstract class ChessPiece {
     color: PieceColor;
-    moveCount: number = 0;
+    moveCount: number;
     posX: number;
     posY: number;
     abstract type: PieceType;
@@ -31,8 +11,9 @@ export abstract class ChessPiece {
     abstract continuosMovement: boolean;
     captureDirections: number[][] = [];
 
-    constructor(color: PieceColor, pos: [posX: number, posY: number]) {
+    constructor(color: PieceColor, pos: [posX: number, posY: number], moveCount = 0) {
         this.color = color;
+        this.moveCount = moveCount;
         [this.posX, this.posY] = pos;
     }
 
@@ -45,33 +26,45 @@ export abstract class ChessPiece {
         this.moveCount++;
     }
 
+    getMoveCount() {
+        return this.moveCount;
+    }
+
     atInitialPosition() {
         return this.moveCount === 0;
     }
  
-    getMovements(boardState: (ChessPiece|null)[][]) {
+    getMovements(boardState: BoardState) {
         let movements: string[] = [];
 
         this.directions.forEach(direction => {
-            let look = this.continuosMovement;                               
             const [px, py] = direction;
-                let [currentX, currentY] = [this.posX + px, this.posY + py];
+            let [currentX, currentY] = [this.posX + px, this.posY + py];
+            let shouldLook = this.continuosMovement;                               
 
-                do {
-                    const possiblePosition = boardState?.[currentX]?.[currentY];
+            do {
+                const possiblePosition = boardState?.[currentX]?.[currentY];
+                const positionId = getBoardPositionId(currentX, currentY);
 
-                    if (possiblePosition === null) {
-                        movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`)
-                        currentX = currentX + px;
-                        currentY = currentY + py;
-                    } else if (possiblePosition?.color !== this.color) {
-                        movements.push(`${BOARD_POSITION_ID_PREFIX}${currentX}-${currentY}`);
-                        look = false;
-                    } else {
-                        look = false;
+                // Check if the tile is empty
+                if (possiblePosition === null) {
+                    movements.push(positionId)
+                    currentX = currentX + px;
+                    currentY = currentY + py;
+                    continue;
+                // Check if the tile has a opposite position
+                } else if (possiblePosition?.color !== this.color) {
+                    // This condition is to avoid a King attacking a King
+                    if (![this.type, possiblePosition?.type].every(type => type === PieceType.King)) {
+                        movements.push(positionId);
                     }
-                } while(look);
-            });
+
+                    shouldLook = false;
+                } else {
+                    shouldLook = false;
+                }
+            } while(shouldLook);
+        });
 
         return movements;
     }

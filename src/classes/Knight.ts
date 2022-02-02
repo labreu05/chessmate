@@ -1,4 +1,5 @@
-import { ChessPiece, PieceType } from "./ChessPiece";
+import { PieceType } from "../utils/types";
+import { ChessPiece } from "./ChessPiece";
 
 export class Knight extends ChessPiece {
     type = PieceType.Knight;

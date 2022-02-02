@@ -1,38 +1,34 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { ChessPiece, PieceColor } from "../classes/ChessPiece";
+import { ChessPiece } from "../classes/ChessPiece";
+import { PieceImage } from "./PieceImage";
 
-export const Piece = ({piece, posX, posY, handleClick}: {piece: ChessPiece, posX: number, posY: number, handleClick: (piece: ChessPiece) => void}) => {
-    const keyProps = `${posX}-${posY}`;
-    const filterValue = piece.color === PieceColor.White  ? 'invert(0)' : 'invert(1)';
+type Props = {
+    piece: ChessPiece;
+    handleClick: (piece: ChessPiece) => void;
+}
 
-    if (piece.posX === undefined || piece.posY === undefined) {
-        piece.setPos(posX, posY);
-    }
+export const Piece = ({ piece, handleClick }: Props) => {
+    const keyProps = `${piece.posX}-${piece.posY}`;
 
     return (
         <Draggable
         key={keyProps}
         draggableId={keyProps}
-        index={Number('1' + posX + posY)}
+        index={Number('1' + piece.posX + piece.posY)}
         //Keep track of the turn and disable other pieces
         isDragDisabled={false}
         >
         {(provided, snapshot) => (
             <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
             >
-            <img
-                alt={`${piece.color} ${piece.type}`}
-                src={`${piece.type}.png`}
-                draggable="true"
-                width="70px"
-                height="70px"
-                style={{cursor: 'pointer', filter: filterValue}}
-                onMouseDown={() => handleClick(piece)}
-            />
+                <PieceImage
+                    piece={piece}
+                    handlePress={() => handleClick(piece)}
+                />
             </div>
         )}
         </Draggable>
