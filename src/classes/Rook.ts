@@ -3,10 +3,10 @@ import { PieceType } from "../utils/types";
 import { CastleableChessPiece } from "./CastleableChessPiece";
 
 export class Rook extends CastleableChessPiece {
-    type = PieceType.Rook;
-    continuosMovement = true;
+  type = PieceType.Rook;
+  continuosMovement = true;
 
-    get directions() {
-        return MOVEMENT_STRAIGHT;
-    }
+  get directions() {
+    return MOVEMENT_STRAIGHT;
+  }
 }
