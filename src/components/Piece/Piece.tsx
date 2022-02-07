@@ -1,7 +1,7 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { ChessPiece } from "../classes/ChessPiece";
-import { PieceImage } from "./PieceImage";
+import { ChessPiece } from "../../classes/ChessPiece";
+import { PieceImage } from "../PieceImage/PieceImage";
 
 type Props = {
   piece: ChessPiece;
@@ -16,20 +16,18 @@ export const Piece = ({ piece, handleClick, isDragDisabled }: Props) => {
     <Draggable
       key={key}
       draggableId={key}
+      // TODO: Look for a way to fix this required index
       index={Number("1" + piece.posX + piece.posY)}
-      //Keep track of the turn and disable other pieces
       isDragDisabled={isDragDisabled}
     >
-      {(provided, snapshot) => (
+      {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          onMouseDown={!isDragDisabled ? () => handleClick(piece) : undefined}
         >
-          <PieceImage
-            piece={piece}
-            handlePress={!isDragDisabled ? () => handleClick(piece) : undefined}
-          />
+          <PieceImage color={piece.color} type={piece.type} />
         </div>
       )}
     </Draggable>

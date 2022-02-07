@@ -1,0 +1,24 @@
+.piece-image {
+  cursor: pointer;
+
+  &.inverted {
+    filter: invert(1);
+  }
+
+  &.small {
+    width: 50px;
+    height: 50px;
+  }
+
+  &.medium {
+    width: 70px;
+    height: 70px;
+  }
+
+  &:hover {
+    outline: none;
+    border-color: #26bf47;
+    box-shadow: 0 0 10px #26bf47;
+    border-radius: 4px;
+  }
+}

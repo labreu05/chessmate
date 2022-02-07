@@ -1,11 +1,10 @@
+import { cloneDeep } from "lodash";
 import React, { useEffect, useState } from "react";
-
-import { Square } from "./Square";
-import { Piece } from "./Piece";
 import { DragDropContext } from "react-beautiful-dnd";
-import { initialBoard, initialState } from "../utils/initialData";
-import { CastleableChessPiece, ChessPiece } from "../classes";
-import { NEGATIVE_MOVEMENT, POSITIVE_MOVEMENT } from "../utils/constants";
+import { DraggableLocation } from "react-beautiful-dnd";
+import { CastleableChessPiece } from "../../classes/CastleableChessPiece";
+import { ChessPiece } from "../../classes/ChessPiece";
+import { NEGATIVE_MOVEMENT, POSITIVE_MOVEMENT } from "../../utils/constants";
 import {
   changePieceType,
   cloneBoardState,
@@ -13,10 +12,14 @@ import {
   getBoardState,
   getCoordinateFromBoardId,
   saveBoardState,
-} from "../utils/helpers";
-import { BoardState, GameState, PieceColor, PieceType } from "../utils/types";
-import { DraggableLocation } from "react-beautiful-dnd";
-import { getPromotion } from "./PawnPromotionModal";
+} from "../../utils/helpers";
+import { initialState } from "../../utils/initialData";
+import { GameState, PieceColor, PieceType } from "../../utils/types";
+import { GameContainer } from "../GameContainer/GameContainer";
+import { getPromotion } from "../PawnPromotionModal/PawnPromotionModal";
+import { Piece } from "../Piece/Piece";
+import { Square } from "../Square/Square";
+import "./styles.scss";
 
 export const Board = () => {
   const [gameState, setGameState] = useState<GameState>(initialState);
@@ -34,6 +37,15 @@ export const Board = () => {
   }, [gameState.boardState, selectedPiece]);
 
   // TODO: Add effect to update what is saved at local storage
+  useEffect(() => {
+    saveBoardState(gameState);
+  }, [gameState]);
+
+  const reset = () => {
+    setGameState(initialState);
+    setSelectedPiece(null);
+    setValidMoves([]);
+  };
 
   const onDragEnd = async (result: {
     source: DraggableLocation;
@@ -54,6 +66,8 @@ export const Board = () => {
       const sourcePiece = boardClone[destinationX][destinationY];
 
       if (targetPiece) {
+        // Add code to determine draw
+        // Add code to win a match
         // Code to promote a pawn
         if (
           targetPiece?.type === PieceType.Pawn &&
@@ -116,65 +130,83 @@ export const Board = () => {
         }
 
         if (updateBoard && selectedPiece) {
-          const here: GameState = {
-            ...gameState,
+          let newGameState = cloneDeep(gameState);
+
+          newGameState = {
+            ...newGameState,
             boardState: boardClone,
+            black: cloneDeep(gameState.black),
+            white: cloneDeep(gameState.white),
           };
 
-          here[selectedPiece?.color].moves++;
-          here.turn =
-            here.turn === PieceColor.White
+          newGameState[selectedPiece?.color].moves =
+            newGameState[selectedPiece?.color].moves + 1;
+          if (takenPiece) {
+            newGameState[selectedPiece?.color].piecesTaken[takenPiece.type] =
+              newGameState[selectedPiece?.color].piecesTaken[takenPiece.type] +
+              1;
+          }
+
+          if (takenPiece?.type === PieceType.King) {
+          }
+
+          newGameState.turn =
+            selectedPiece?.color === PieceColor.White
               ? PieceColor.Black
               : PieceColor.White;
 
-          if (takenPiece) {
-            here[selectedPiece?.color].piecesTaken[takenPiece.type]++;
-          }
-
           setSelectedPiece(null);
           setValidMoves([]);
-          setGameState(here);
-          saveBoardState(here);
+          setGameState(newGameState);
         }
       }
     }
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {gameState.boardState.map((row, rowIndex) => (
-        <div className="chess-row" key={`chess-row-${rowIndex}`}>
-          {row.map((square, squareIndex) => {
-            const squareId = getBoardPositionId(rowIndex, squareIndex);
-            const canMove = validMoves.includes(squareId);
-            const canAttack =
-              canMove &&
-              square !== null &&
-              square?.color !== selectedPiece?.color;
-            const canBeDragged = square?.color !== gameState.turn;
-            console.log(square?.color, gameState.turn);
+    <GameContainer state={gameState}>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {gameState.boardState.map((row, rowIndex) => (
+          <div className="chess-row" key={`chess-row-${rowIndex}`}>
+            {row.map((square, squareIndex) => {
+              const squareId = getBoardPositionId(rowIndex, squareIndex);
+              const canMove = validMoves.includes(squareId);
+              const canAttack =
+                canMove &&
+                square !== null &&
+                square?.color !== selectedPiece?.color;
+              const canBeDragged = square?.color !== gameState.turn;
 
-            return (
-              <Square
-                id={squareId}
-                key={squareId}
-                canMove={canMove}
-                underAttack={canAttack}
-              >
-                {square ? (
-                  <Piece
-                    piece={square}
-                    handleClick={(piece: ChessPiece) => {
-                      setSelectedPiece(piece);
-                    }}
-                    isDragDisabled={canBeDragged}
-                  />
-                ) : null}
-              </Square>
-            );
-          })}
-        </div>
-      ))}
-    </DragDropContext>
+              return (
+                <Square
+                  id={squareId}
+                  key={squareId}
+                  canMove={canMove}
+                  underAttack={canAttack}
+                >
+                  {square ? (
+                    <Piece
+                      piece={square}
+                      handleClick={(piece: ChessPiece) => {
+                        setSelectedPiece(piece);
+                      }}
+                      isDragDisabled={canBeDragged}
+                    />
+                  ) : null}
+                </Square>
+              );
+            })}
+          </div>
+        ))}
+        <button
+          onClick={() => {
+            reset();
+          }}
+          title="PRess mee"
+        >
+          RESET
+        </button>
+      </DragDropContext>
+    </GameContainer>
   );
 };

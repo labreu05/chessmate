@@ -15,7 +15,6 @@ export abstract class ChessPiece {
     color: PieceColor,
     pos: [posX: number, posY: number],
     moveCount = 0
-    
   ) {
     this.color = color;
     this.moveCount = moveCount;
@@ -65,7 +64,6 @@ export abstract class ChessPiece {
               (type) => type === PieceType.King
             )
           ) {
-
             movements.push(positionId);
           }
 

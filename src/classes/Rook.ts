@@ -2,7 +2,7 @@ import { MOVEMENT_STRAIGHT } from "../utils/constants";
 import { PieceType } from "../utils/types";
 import { CastleableChessPiece } from "./CastleableChessPiece";
 
-export class Rook extends CastleableChessPiece {
+export default class Rook extends CastleableChessPiece {
   type = PieceType.Rook;
   continuosMovement = true;
 

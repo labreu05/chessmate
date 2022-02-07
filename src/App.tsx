@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
-import { Board } from "./components/Board";
+import "./App.scss";
+import { Board } from "./components/Board/Board";
 import "antd/dist/antd.css";
 
 function App() {

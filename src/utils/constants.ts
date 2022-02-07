@@ -17,3 +17,5 @@ export const POSITIVE_MOVEMENT = 1;
 export const NEGATIVE_MOVEMENT = -1;
 
 export const BOARD_POSITION_ID_PREFIX = "chess-square-";
+
+export const LOCAL_STORAGE_KEY = "chessmate";

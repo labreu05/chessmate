@@ -1,12 +1,16 @@
-import {
-  ChessPiece,
-  King,
-  Queen,
-  Knight,
-  Bishop,
-  Pawn,
-  Rook,
-} from "../classes";
+// import {
+//   ChessPiece,
+//   King,
+//   Queen,
+//   Knight,
+//   Bishop,
+//   Pawn,
+//   Rook,
+// } from "../classes";
+import { ChessPiece } from "../classes/ChessPiece";
+import { King } from "../classes/King";
+import { Pawn } from "../classes/Pawn";
+import Rook from "../classes/Rook";
 import { GameState, PieceColor, PieceType } from "./types";
 
 export const initialBoard: (ChessPiece | null)[][] = [

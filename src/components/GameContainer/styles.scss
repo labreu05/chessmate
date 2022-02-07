@@ -1,0 +1,13 @@
+.taken-pieces-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+  background-color: rgba(1, 1, 1, 0.3);
+  border-radius: 3px;
+  width: max-content;
+  padding: 10px;
+
+  &:empty {
+    display: none;
+  }
+}

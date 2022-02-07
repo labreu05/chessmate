@@ -1,5 +1,7 @@
+import classnames from "classnames";
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
+import "./styles.scss";
 
 type Props = {
   id: string;
@@ -13,16 +15,12 @@ export const Square = ({ id, canMove, underAttack, children }: Props) => {
     <Droppable droppableId={id} isDropDisabled={!canMove}>
       {(provided, snapshot) => (
         <div
-          className="chess-square"
+          className={classnames("chess-square", {
+            "under-attack": underAttack,
+            "can-move": !underAttack && canMove,
+            "dragging-over": snapshot.isDraggingOver,
+          })}
           ref={provided.innerRef}
-          style={{
-            backgroundColor: snapshot.isDraggingOver ? "#3fbcec" : "",
-            boxShadow: underAttack
-              ? "inset rgb(255 0 0) 0px 0px 10px 2px"
-              : canMove
-              ? "inset rgb(0 255 0) 0px 0px 10px 2px"
-              : "none",
-          }}
         >
           {children}
           {provided.placeholder}

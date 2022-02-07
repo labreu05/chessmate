@@ -1,0 +1,18 @@
+.chess-square {
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+  box-shadow: none;
+
+  &.under-attack {
+    box-shadow: inset rgb(255 0 0) 0px 0px 10px 2px;
+  }
+
+  &.can-move {
+    box-shadow: inset rgb(0 255 0) 0px 0px 10px 2px;
+  }
+
+  &.dragging-over {
+    background-color: #3fbcec;
+  }
+}

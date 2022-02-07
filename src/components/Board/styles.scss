@@ -1,0 +1,19 @@
+.chess-row {
+  display: flex;
+}
+
+.chess-row:nth-child(odd) .chess-square:nth-child(odd) {
+  background-color: #769656;
+}
+
+.chess-row:nth-child(odd) .chess-square:nth-child(even) {
+  background-color: #eeeed2;
+}
+
+.chess-row:nth-child(even) .chess-square:nth-child(even) {
+  background-color: #769656;
+}
+
+.chess-row:nth-child(even) .chess-square:nth-child(odd) {
+  background-color: #eeeed2;
+}

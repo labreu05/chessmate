@@ -1,4 +1,5 @@
-import { ChessPiece } from "../classes";
+// import { ChessPiece } from "../classes";
+import { ChessPiece } from "../classes/ChessPiece";
 
 export enum PieceColor {
   Black = "black",
@@ -23,7 +24,6 @@ export type GameState = {
 
 export type PlayerState = {
   moves: number;
-  // piecesTaken: Record<PieceType, number> | {},
   piecesTaken: {
     [PieceType.King]: number;
     [PieceType.Queen]: number;

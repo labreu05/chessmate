@@ -1,15 +1,22 @@
 import _ from "lodash";
-import {
-  ChessPiece,
-  Knight,
-  Queen,
-  Rook,
-  Bishop,
-  Pawn,
-  King,
-} from "../classes";
-import { BOARD_POSITION_ID_PREFIX } from "./constants";
-import { initialBoard, initialState } from "./initialData";
+import { Bishop } from "../classes/Bishop";
+import { ChessPiece } from "../classes/ChessPiece";
+import { King } from "../classes/King";
+import { Knight } from "../classes/Knight";
+import { Pawn } from "../classes/Pawn";
+import { Queen } from "../classes/Queen";
+import Rook from "../classes/Rook";
+// import {
+//   ChessPiece,
+//   Knight,
+//   Queen,
+//   Rook,
+//   Bishop,
+//   Pawn,
+//   King,
+// } from "../classes";
+import { BOARD_POSITION_ID_PREFIX, LOCAL_STORAGE_KEY } from "./constants";
+import { initialState } from "./initialData";
 import { BoardState, GameState, PieceType } from "./types";
 
 export const cloneBoardState = (boardState: BoardState) => {
@@ -65,34 +72,34 @@ export const changePieceType = (piece: ChessPiece, newType: PieceType) => {
 };
 
 export const getBoardState = (): GameState => {
-  const stringState = localStorage.getItem("chessmate");
+  const stringState = localStorage.getItem(LOCAL_STORAGE_KEY);
   let result = initialState;
 
-  if (stringState) {
-    const parsedState: GameState = JSON.parse(stringState);
+  // if (stringState) {
+  //   const parsedState: GameState = JSON.parse(stringState);
 
-    parsedState.boardState
-      .flatMap((x) => x)
-      .forEach((piece) => {
-        if (piece !== null) {
-          const actualPiece = changePieceType(piece, piece.type);
-          if (actualPiece) {
-            const { posX, posY } = actualPiece;
-            if (posX !== undefined && posY !== undefined) {
-              parsedState.boardState[posX][posY] = actualPiece;
-            }
+  //   parsedState.boardState
+  //     .flatMap((x) => x)
+  //     .forEach((piece) => {
+  //       if (piece !== null) {
+  //         const actualPiece = changePieceType(piece, piece.type);
+  //         if (actualPiece) {
+  //           const { posX, posY } = actualPiece;
+  //           if (posX !== undefined && posY !== undefined) {
+  //             parsedState.boardState[posX][posY] = actualPiece;
+  //           }
 
-            piece = actualPiece;
-          }
-        }
-      });
+  //           piece = actualPiece;
+  //         }
+  //       }
+  //     });
 
-    result = parsedState;
-  }
+  //   result = parsedState;
+  // }
 
   return result;
 };
 
 export const saveBoardState = (state: GameState) => {
-  return localStorage.setItem("chessmate", JSON.stringify(state));
+  return localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
 };

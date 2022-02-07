@@ -1,7 +1,8 @@
 import { Modal } from "antd";
-import { PlaceholderChessPiece } from "../classes";
-import { PieceColor, PieceType } from "../utils/types";
-import { PieceImage } from "./PieceImage";
+import { PlaceholderChessPiece } from "../../classes/PlaceholderChessPiece";
+import { PieceColor, PieceType } from "../../utils/types";
+import { PieceImage } from "../PieceImage/PieceImage";
+import "./styles.scss";
 
 type ContentProps = {
   onClick: (value: PieceType) => void;
@@ -17,14 +18,17 @@ const Content = ({ onClick, color }: ContentProps) => {
   ];
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+    <div className="promotion-modal-content">
       {types.map((type) => {
         const piece = new PlaceholderChessPiece(color, [0, 0], type);
 
         return (
           <PieceImage
-            piece={piece}
+            key={`${type}-${color} promotion`}
+            color={piece.color}
+            type={piece.type}
             draggable={false}
+            size="small"
             handleClick={() => onClick(type)}
           />
         );

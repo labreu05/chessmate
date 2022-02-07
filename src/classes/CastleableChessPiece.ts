@@ -5,8 +5,8 @@ import {
   getCoordinateFromBoardId,
 } from "../utils/helpers";
 import { BoardState, PieceType } from "../utils/types";
-import { PlaceholderChessPiece } from "./PlaceholderChessPiece";
 import { ChessPiece } from "./ChessPiece";
+import { PlaceholderChessPiece } from "./PlaceholderChessPiece";
 
 export abstract class CastleableChessPiece extends ChessPiece {
   getMovements(boardState: BoardState): string[] {
